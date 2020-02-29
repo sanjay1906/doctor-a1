@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/pantherofficial404/Doctor-AI#readme",
   "dependencies": {
-    "concurrently": "^5.1.0"
+    "concurrently": "^5.1.0",
+    "validate.js": "^0.13.1"
   }
 }
