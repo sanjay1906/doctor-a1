@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:portal": "cd portal && npm start && cd ..",
+    "portal": "cd portal && npm start && cd ..",
     "install": "cd portal && npm install && cd .. && cd backend && npm install && cd ..",
-    "start:backend": "cd backend && npm start && cd ..",
-    "start": "npm run start:backend",
+    "backend": "cd backend && npm start && cd ..",
     "build:portal": "cd portal && npm run build && cd --",
-    "build": "npm run build:portal && cd --"
+    "build": "npm run build:portal && cd --",
+    "start": "concurrently \"npm run backend\" \"npm run portal\""
   },
   "cacheDirectories": [
     "backend/node_modules",
@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/pantherofficial404/Doctor-AI/issues"
   },
-  "homepage": "https://github.com/pantherofficial404/Doctor-AI#readme"
+  "homepage": "https://github.com/pantherofficial404/Doctor-AI#readme",
+  "dependencies": {
+    "concurrently": "^5.1.0"
+  }
 }

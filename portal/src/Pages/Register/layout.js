@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import useStyles from "./style";
-import { Header } from "Components";
-import LockIcon from "@material-ui/icons/Lock";
+import React, { useState, useEffect } from 'react';
+import useStyles from './style';
+import { Header } from 'Components';
+import LockIcon from '@material-ui/icons/Lock';
 import {
   InputAdornment,
   TextField,
@@ -9,15 +9,15 @@ import {
   Container,
   Link,
   Typography
-} from "@material-ui/core";
-import EmailIcon from "@material-ui/icons/Email";
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
+} from '@material-ui/core';
+import EmailIcon from '@material-ui/icons/Email';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 
 //For Data Retriving from the redux
-import { useSelector } from "react-redux";
-import { SingUp } from "Store/action";
-import { AuthServices } from "Services";
-import { useHistory } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { SingUp } from 'Store/action';
+import { AuthServices } from 'Services';
+import { useHistory } from 'react-router-dom';
 
 const Layout = props => {
   const classes = useStyles();
@@ -61,14 +61,14 @@ const Layout = props => {
                       id="input-with-icon-AcccountCircle"
                       fullWidth
                       size="medium"
-                      placeholder="Name"
+                      placeholder="Email"
                       type="text"
                       value={username}
                       onChange={e => setUsername(e.target.value)}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <PersonAddIcon style={{ color: "#222222" }} />
+                            <PersonAddIcon style={{ color: '#222222' }} />
                           </InputAdornment>
                         )
                       }}
@@ -85,7 +85,7 @@ const Layout = props => {
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <EmailIcon style={{ color: "#222222" }} />
+                            <EmailIcon style={{ color: '#222222' }} />
                           </InputAdornment>
                         )
                       }}
