@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import Header from "Components/Header";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import Map from "./component/Map";
+import React, { useState, useEffect } from 'react';
+import Header from 'Components/Header';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import Map from './component/Map';
 
 // import useStyles from "./style";
 
 //SideDrawer
-import clsx from "clsx";
+import clsx from 'clsx';
 import {
   Container,
   AppBar,
@@ -22,30 +22,30 @@ import {
   IconButton,
   Paper,
   InputBase
-} from "@material-ui/core";
+} from '@material-ui/core';
 
-import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import MailIcon from "@material-ui/icons/Mail";
+import MenuIcon from '@material-ui/icons/Menu';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import MailIcon from '@material-ui/icons/Mail';
 import SearchIcon from '@material-ui/icons/Search';
 import DirectionsIcon from '@material-ui/icons/Directions';
 
-import { InputComponent } from "Components";
+import { InputComponent } from 'Components';
 
 //Side Drawer
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
   root: {
-    display: "flex",
-    justifyContent: "Center",
-    alignItems: "Center"
+    display: 'flex',
+    justifyContent: 'Center',
+    alignItems: 'Center'
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
     })
@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
   appBarShift: {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     })
@@ -62,35 +62,35 @@ const useStyles = makeStyles(theme => ({
     marginRight: 36
   },
   hide: {
-    display: "none"
+    display: 'none'
   },
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: "nowrap"
+    whiteSpace: 'nowrap'
   },
   drawerOpen: {
     width: drawerWidth,
-    transition: theme.transitions.create("width", {
+    transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     })
   },
   drawerClose: {
-    transition: theme.transitions.create("width", {
+    transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
     }),
-    overflowX: "hidden",
+    overflowX: 'hidden',
     width: theme.spacing(7) + 1,
-    [theme.breakpoints.up("sm")]: {
+    [theme.breakpoints.up('sm')]: {
       width: theme.spacing(9) + 1
     }
   },
   toolbar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
     padding: theme.spacing(0, 1),
     ...theme.mixins.toolbar
   },
@@ -99,35 +99,35 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(3)
   },
   inputSearchFiled: {
-    textAlign: "center",
-    marginTop: "5rem"
+    textAlign: 'center',
+    marginTop: '5rem'
   },
   inputSearch: {
-    padding: "1rem",
+    padding: '1rem',
     width: theme.spacing() * 50,
-    background: "#D9F1E3",
-    border: "1px solid #d3d3d3",
-    boxShadow: "0px 8px 20px 0px rgba(0, 0, 0, 0.15)",
-    outline: "none",
+    background: '#D9F1E3',
+    border: '1px solid #d3d3d3',
+    boxShadow: '0px 8px 20px 0px rgba(0, 0, 0, 0.15)',
+    outline: 'none',
     // borderRadius: "34px"
-    borderTopLeftRadius: "25px",
-    borderBottomLeftRadius: "25px",
-    [theme.breakpoints.only("xs")]: {
+    borderTopLeftRadius: '25px',
+    borderBottomLeftRadius: '25px',
+    [theme.breakpoints.only('xs')]: {
       // marginTop: "1rem",
-      borderRadius: "5px"
+      borderRadius: '5px'
     }
   },
   searchButton: {
-    padding: "18px 30px ",
-    background: "#7563FF",
-    color: "#fff",
-    border: "none",
-    borderTopRightRadius: "25px",
-    borderBottomRightRadius: "25px",
-    outline: "none",
-    [theme.breakpoints.only("xs")]: {
-      marginTop: "1rem",
-      borderRadius: "5px"
+    padding: '18px 30px ',
+    background: '#7563FF',
+    color: '#fff',
+    border: 'none',
+    borderTopRightRadius: '25px',
+    borderBottomRightRadius: '25px',
+    outline: 'none',
+    [theme.breakpoints.only('xs')]: {
+      marginTop: '1rem',
+      borderRadius: '5px'
     }
   }
 }));
@@ -139,8 +139,8 @@ const Home = props => {
   const [mapPermission, setMapPermission] = useState(null);
   const [deseaseName, setDeseaseName] = useState(null);
   const [state, setstate] = useState({
-    latitude: "",
-    logitude: "",
+    latitude: '',
+    logitude: '',
     isLoaded: false
   });
 
@@ -155,7 +155,7 @@ const Home = props => {
   useEffect(() => {
     (async () => {
       const permission = await navigator.permissions.query({
-        name: "geolocation"
+        name: 'geolocation'
       });
       setMapPermission(permission.state);
       permission.onchange = () => {
@@ -165,7 +165,7 @@ const Home = props => {
   }, []);
 
   useEffect(() => {
-    if (mapPermission === "granted") {
+    if (mapPermission === 'granted') {
       navigator.geolocation.getCurrentPosition(location => {
         setstate({
           latitude: location.coords.latitude,
@@ -186,10 +186,11 @@ const Home = props => {
       <CssBaseline />
       <AppBar
         position="fixed"
-        style={{ background: "#7563FF" }}
+        style={{ background: '#7563FF' }}
         className={clsx(classes.appBar, {
           [classes.appBarShift]: open
-        })}>
+        })}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -198,7 +199,8 @@ const Home = props => {
             edge="start"
             className={clsx(classes.menuButton, {
               [classes.hide]: open
-            })}>
+            })}
+          >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
@@ -217,10 +219,11 @@ const Home = props => {
             [classes.drawerOpen]: open,
             [classes.drawerClose]: !open
           })
-        }}>
+        }}
+      >
         <div className={classes.toolbar}>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
+            {theme.direction === 'rtl' ? (
               <ChevronRightIcon />
             ) : (
               <ChevronLeftIcon />
@@ -229,7 +232,7 @@ const Home = props => {
         </div>
         <Divider />
         <List>
-          {["Home", "Hospital", "Send email", "Drafts"].map((text, index) => (
+          {['Home', 'Hospital', 'Send email', 'Drafts'].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>
                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
@@ -240,18 +243,8 @@ const Home = props => {
         </List>
       </Drawer>
       <main className={classes.content}>
-        <div style={{marginTop:60,display:'flex'}}>
-          <InputBase
-            placeholder="Search your desease"
-            fullWidth
-            style={{borderBottom:'1px solid rgba(0,0,0,0.4)'}}
-          />
-          <IconButton type="submit" className={classes.iconButton} aria-label="search">
-            <SearchIcon color="primary"/>
-          </IconButton>
-          </div>
         <div>
-          {Boolean(mapPermission === "granted" && state.isLoaded) && (
+          {Boolean(mapPermission === 'granted' && state.isLoaded) && (
             <Map
               options={{
                 center: { lat: state.latitude, lng: state.logitude },
@@ -259,7 +252,7 @@ const Home = props => {
               }}
             />
           )}
-          {Boolean(mapPermission !== "granted" && state.isLoaded) && (
+          {Boolean(mapPermission !== 'granted' && state.isLoaded) && (
             <div>
               <p>Please enable Geolocation permission</p>
             </div>

@@ -71,7 +71,8 @@ const Layout = props => {
     const { username, password } = formState.values;
     try {
       // Todo : Validate username and password should always has value
-      await AuthServices.login(username, password);
+      const response = await AuthServices.login(username, password);
+      // if(!response.success)
       history.push('/hospital');
     } catch (err) {
       alert('user not here');
