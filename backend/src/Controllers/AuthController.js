@@ -1,22 +1,17 @@
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const { User } = require('Models');
-const validator = require('validator');
+const jwt = require("jsonwebtoken");
+const config = require("config");
+const { User } = require("Models");
 
 const login = async (req, res, next) => {
   const { username, password } = req.body;
-  const validEmail = validator.isEmail(username);
   const message = [];
   if (!username) {
-    message.push('Username is required');
-  }
-  if (validEmail === false) {
-    message.push('Please enter valid Email');
+    message.push("Username is required");
   }
   if (!password) {
-    message.push('Password is required');
+    message.push("Password is required");
   }
-  if (!username || !password || validEmail === false) {
+  if (!username || !password) {
     res.status(404);
     res.json({
       code: 401,
@@ -37,7 +32,7 @@ const login = async (req, res, next) => {
     res.json({
       code: 401,
       data: {
-        message: ['Invalid username or password']
+        message: ["Invalid username or password"]
       },
       success: false
     });
@@ -46,9 +41,10 @@ const login = async (req, res, next) => {
   const expiredOn = Date.now() + 1000 * 60 * 60;
   const authInfo = {
     expiredOn,
-    username
+    username,
+    _id: user._id
   };
-  const token = jwt.sign(JSON.stringify(authInfo), config.get('jwt').secret);
+  const token = jwt.sign(JSON.stringify(authInfo), config.get("jwt").secret);
   res.status(200);
   res.json({
     code: 200,
@@ -56,7 +52,8 @@ const login = async (req, res, next) => {
       expiredOn,
       token,
       username,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
+      _id: user._id
     },
     success: true
   });
@@ -65,16 +62,12 @@ const login = async (req, res, next) => {
 
 const signup = async (req, res, next) => {
   const { username, password } = req.body;
-  const validEmail = validator.isEmail(username);
   const message = [];
   if (!username) {
-    message.push('Username is required');
+    message.push("Username is required");
   }
-  // if (validEmail === false) {
-  //   message.push('Please enter valid Email');
-  // }
   if (!password) {
-    message.push('Password is required');
+    message.push("Password is required");
   }
   if (!username || !password) {
     res.status(401);
@@ -93,7 +86,7 @@ const signup = async (req, res, next) => {
     res.json({
       code: 401,
       data: {
-        message: ['User is already exists']
+        message: ["User is already exists"]
       },
       success: false
     });
@@ -105,7 +98,8 @@ const signup = async (req, res, next) => {
     expiredOn,
     username
   };
-  const token = jwt.sign(JSON.stringify(authInfo), config.get('jwt').secret);
+
+  const token = jwt.sign(JSON.stringify(authInfo), config.get("jwt").secret);
   await new User({
     username,
     password

@@ -34,8 +34,8 @@ const HospitalSchema = new mongoose.Schema({
     required: false,
   },
   category: {
-    type: [mongoose.Schema.Types.Mixed],
-    require: false
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Category',
   },
   mobileNo: {
     type: [mongoose.Schema.Types.Number],

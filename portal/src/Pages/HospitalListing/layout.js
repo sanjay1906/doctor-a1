@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
-import { Button } from '@material-ui/core';
+import React, { useEffect } from "react";
+import { Button } from "@material-ui/core";
 
-import { Header, Listing } from 'Components';
-import useStyles from './style';
-import { fetchHospitalListing } from 'Store/action';
-import { selectHospital } from 'Store/selectors';
-import { useSelector } from 'react-redux';
-import { getFormattedString } from 'Helper';
-import { useHistory } from 'react-router-dom';
+import { Header, Listing } from "Components";
+import useStyles from "./style";
+import { fetchHospitalListing } from "Store/action";
+import { selectHospital } from "Store/selectors";
+import { useSelector } from "react-redux";
+import { getFormattedString } from "Helper";
+import { useHistory } from "react-router-dom";
 
 const Layout = props => {
   const classes = useStyles();
@@ -29,17 +29,16 @@ const Layout = props => {
           variant="contained"
           color="primary"
           className={classes.button}
-          onClick={() => history.push('/add/hospital')}
-        >
+          onClick={() => history.push("/add/hospital")}>
           ADD HOSPITAL
         </Button>
       </div>
       <Listing
         data={hospitalListing}
         keys={{
-          hospitalName: 'Hospital Name',
-          mobileNo: 'Mobile Number',
-          address: 'Address'
+          hospitalName: "Hospital Name",
+          mobileNo: "Mobile Number",
+          address: "Address"
         }}
         onClick={navigateHospitalDetail}
       />

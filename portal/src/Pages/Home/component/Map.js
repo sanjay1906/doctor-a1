@@ -1,57 +1,57 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef,useState } from "react";
 import Config from "Config";
 import axios from "axios";
+import { handleError } from "Store/helper";
+import GoogleMapReact from 'google-map-react';
+
 
 const google = window.google;
 
-var features = [
-  {
-    position: new google.maps.LatLng(22.258651999999998, 71.1923805)
-  },
-  {
-    position: new google.maps.LatLng(23.240311, 72.6529741)
-  },
-  {
-    position: new google.maps.LatLng(23.240311, 6529741)
-  },
-  {
-    position: new google.maps.LatLng(23.2566797, 72.6469687)
-  },
-  {
-    position: new google.maps.LatLng(23.8481797, 72.0873063)
-  }
-];
-
 const Map = props => {
   const mapRef = useRef(null);
+  const [mapPermission,setMapPermission] = useState(null);
+  const [ deseaseName,setDeseaseName ] = useState(null);
 
-  useEffect(() => {
-    (async () => {
-      const map = new google.maps.Map(mapRef.current, props.options);
-      const { lat, lng } = props.options.center;
-      const latLng = `${lat},${lng}`;
-      let url = `${Config.MAP_URL}&latlng=${encodeURIComponent(latLng)}`;
-      const response = await axios.get(url);
-      const infoWindow = new google.maps.InfoWindow();
-      infoWindow.setPosition(props.options.center);
-      infoWindow.setContent(
-        (response.data.results[0] || {}).formatted_address || "Unknown"
-      );
-      infoWindow.open(map);
-      for (var i = 0; i < features.length; i++) {
-        var marker = new google.maps.Marker({
-          position: features[i].position,
-          map: map,
-        });
-      }
-    })();
-  }, []);
+  useEffect(()=>{
+    if(navigator.geolocation){
+      (async()=>{
+        const permission = await navigator.permissions.query({name:'geolocation'});
+        setMapPermission(permission.state);
+        permission.onchange = ()=>{
+          setMapPermission(permission.state);
+        }
+      })();
+    }
+  },[])
 
+  const handleSearch = ( )=> {
+
+    // TODO : Validate search should not empty
+
+    // TODO : Search Nearby Hospital
+
+
+  }
   return (
-    <div
-      style={{ flex: 1, height: 500, width: "100%", margin: "10px auto" }}
-      ref={mapRef}
-    />
+    <div>
+      </div>
+        /* {state.isLoaded && (
+       
+          <button type="submit" onSubmit={handleSearch}>Search</button>
+        {Boolean(mapPermission==='granted' && state.isLoaded) && (
+          <Map
+            options={{
+              center: { lat: state.latitude, lng: state.logitude },
+              zoom: 13
+            }}
+          />
+        )}
+        {Boolean(mapPermission!=='granted' && state.isLoaded) && (
+          <div>
+            <p>Please enable Geolocation permission</p>
+          </div>
+        )}
+      </div> */
   );
 };
 export default Map;

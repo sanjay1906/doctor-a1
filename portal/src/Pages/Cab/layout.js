@@ -19,6 +19,7 @@ import { InputComponent } from "Components";
 import { handleError } from "Store/helper";
 import { addCab } from "Store/action";
 import { useHistory } from "react-router-dom";
+import ExpressFirebase from 'express-firebase';
 
 const Layout = () => {
   const classes = useStyles();
@@ -29,6 +30,7 @@ const Layout = () => {
   const [cabNumber,setCabNumber] = useState();
   const [isSubmitting,setSubmitting] = useState(false);
   const [isValidForm,setValidForm] = useState(false);
+  const [file,setFile] = useState(null);
 
   const handleAddCab = async()=>{
     try{
@@ -37,13 +39,25 @@ const Layout = () => {
       if(!driverName||!description||!cabName||!cabNumber){
         return setSubmitting(false);
       }
-      await addCab({driverName,description,cabName,cabNumber});
+
+      const imageUrl = await ExpressFirebase.uploadFile(file.name,file.image);
+      if(!imageUrl){
+        return setSubmitting(false);
+      }
+      await addCab({driverName,description,cabName,cabNumber,thumbnailImage:imageUrl});
       history.push('/');
     } catch(err){
       handleError(err);
     }finally{
       // Reset State
       setSubmitting(false);
+    }
+  }
+
+  const handleFileUpload =(e)=>{
+    const files = e.target.files;
+    if(files && files.length){
+      setFile({image:files[0],name:files[0].name});
     }
   }
 
@@ -108,12 +122,13 @@ const Layout = () => {
                       id="raised-button-file"
                       multiple
                       type="file"
+                      onChange={handleFileUpload}
                     />
                     <label htmlFor="raised-button-file">
                       <div style={{ display: 'flex', alignItems: 'center', flex: 1, paddingBottom: 8,marginTop:8, borderBottom: '1px solid rgba(0,0,0,0.5)' }}>
                         <AddAPhotoIcon color="primary" />
                         <Typography variant="body2" color="textSecondary" style={{ padding: '0 10px' }}>
-                          Upload cab image
+                          {(file||{}).name ||'Upload cab image'}
                         </Typography>
                       </div>
                     </label>

@@ -60,8 +60,12 @@ const useStyles = makeStyles(theme => ({
     borderRadius: theme.spacing() * 1,
     fontSize: "1rem",
     letterSpacing: "1px",
+    color: "#fff",
     marginBottom: "0.3rem",
-    background: "#4292DC"
+    background: "#7563FF",
+    "&:hover": {
+      background: "#4031ea"
+    }
   },
 
   links: {

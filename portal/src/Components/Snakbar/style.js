@@ -1,9 +1,9 @@
 const styles = theme => ({
   error: {
-    backgroundColor: 'red'
+    backgroundColor: "red"
   },
   success: {
-    backgroundColor: 'green'
+    backgroundColor: "green"
   }
 });
 

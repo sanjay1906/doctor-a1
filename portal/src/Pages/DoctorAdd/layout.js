@@ -1,40 +1,94 @@
 import React, { useState, useEffect } from 'react';
 import useStyles from './style';
 import Header from 'Components/Header';
+import validate from 'validate.js';
+
 import {
   Container,
   Typography,
   Grid,
-  TextField,
   Button,
-  FormControlLabel,
-  Checkbox
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress
 } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import DegreeIcon from '@material-ui/icons/Bookmark';
-import CategoryIcon from '@material-ui/icons/Category';
-import StarIcon from '@material-ui/icons/Star';
 import DescriptionIcon from '@material-ui/icons/Description';
 import HospitalIcon from '@material-ui/icons/LocalHospital';
 import { InputComponent } from 'Components';
 import { useSelector } from 'react-redux';
-import { selectHospitalDetail } from 'Store/selectors';
+import { selectHospitalDetail, selectCategories } from 'Store/selectors';
 import { useHistory } from 'react-router-dom';
 import { handleError } from 'Store/helper';
-import { addDoctor } from 'Store/action';
+import { addDoctor, fetchCategory } from 'Store/action';
+import ExpressFirebase from 'express-firebase';
+
+const schema = {
+  doctorName: {
+    presence: { allowEmpty: false, message: 'is required' },
+    length: {
+      maximum: 64
+    }
+  },
+  degree: {
+    presence: { allowEmpty: false, message: 'is required' },
+    length: {
+      maximum: 64
+    }
+  },
+  category: {
+    presence: { allowEmpty: false, message: 'is required' },
+    length: {
+      maximum: 64
+    }
+  }
+};
 
 const Layout = () => {
   const selectedHospital = useSelector(selectHospitalDetail);
+  const categoryListing = useSelector(selectCategories);
   const history = useHistory();
-
-  const [doctorName, setDoctorName] = useState();
   const [description, setDescription] = useState();
-  const [degree, setDegree] = useState();
-  const [category, setCategory] = useState();
-  const [isValidForm, setValidForm] = useState(false);
   const [isSubmitting, setSubmitting] = useState(false);
+  const [file, setFile] = useState(null);
+  const [formState, setFormState] = useState({
+    isValid: false,
+    values: {},
+    touched: {},
+    errors: {}
+  });
+
+  useEffect(() => {
+    const errors = validate(formState.values, schema);
+    setFormState(formState => ({
+      ...formState,
+      isValid: errors ? false : true,
+      errors: errors || {}
+    }));
+  }, [formState.values]);
+
+  const handleChange = event => {
+    event.persist();
+
+    setFormState(formState => ({
+      ...formState,
+      values: {
+        ...formState.values,
+        [event.target.name]: event.target.value
+      },
+      touched: {
+        ...formState.touched,
+        [event.target.name]: true
+      }
+    }));
+  };
+
+  const hasError = field =>
+    formState.touched[field] && formState.errors[field] ? true : false;
 
   useEffect(() => {
     if (!selectedHospital.data) {
@@ -42,11 +96,29 @@ const Layout = () => {
     }
   }, [selectedHospital]);
 
+  useEffect(() => {
+    fetchCategory();
+  }, []);
+
+  const { doctorName, degree, category } = formState.values;
+
+  const handleFileUpload = e => {
+    const files = e.target.files;
+    if (files && files.length) {
+      setFile({ image: files[0], name: files[0].name });
+    }
+  };
+
   const handleAddDoctor = async () => {
     try {
       setSubmitting(true);
 
       if (!doctorName || !description || !degree || !category) {
+        return setSubmitting(false);
+      }
+
+      const imageUrl = await ExpressFirebase.uploadFile(file.name, file.image);
+      if (!imageUrl) {
         return setSubmitting(false);
       }
 
@@ -58,7 +130,8 @@ const Layout = () => {
         category,
         latitude: selectedHospital.data.location.coordinates[1],
         longitude: selectedHospital.data.location.coordinates[0],
-        hospitalId: selectedHospital.data._id
+        hospitalId: selectedHospital.data._id,
+        thumbnailImage: imageUrl
       });
 
       // Navigate to Back Screen After Adding
@@ -101,10 +174,17 @@ const Layout = () => {
                     value={(selectedHospital.data || {}).hospitalName}
                   />
                   <InputComponent
+                    name="doctorName"
+                    error={hasError('doctorName')}
+                    helperText={
+                      hasError('doctorName')
+                        ? formState.errors.doctorName[0]
+                        : null
+                    }
+                    onChange={handleChange}
+                    value={formState.values.doctorName || ''}
                     placeholder="Doctor name"
                     Icon={PersonIcon}
-                    value={doctorName}
-                    onChange={e => setDoctorName(e.target.value)}
                   />
                   <InputComponent
                     placeholder="Description"
@@ -115,23 +195,44 @@ const Layout = () => {
                     onChange={e => setDescription(e.target.value)}
                   />
                   <InputComponent
+                    name="degree"
+                    error={hasError('degree')}
+                    helperText={
+                      hasError('degree') ? formState.errors.degree[0] : null
+                    }
+                    onChange={handleChange}
+                    value={formState.values.degree || ''}
                     placeholder="Degree"
                     Icon={DegreeIcon}
-                    value={degree}
-                    onChange={e => setDegree(e.target.value)}
                   />
-                  <InputComponent
-                    placeholder="Category"
-                    Icon={CategoryIcon}
-                    value={category}
-                    onChange={e => setCategory(e.target.value)}
-                  />
+                  <FormControl style={{ flex: 1, display: 'flex' }}>
+                    <InputLabel>Select Category</InputLabel>
+                    <Select
+                      name="category"
+                      error={hasError('category')}
+                      helperText={
+                        hasError('category')
+                          ? formState.errors.category[0]
+                          : null
+                      }
+                      onChange={handleChange}
+                      value={formState.values.category || ''}
+                      id="demo-simple-select"
+                      fullWidth
+                    >
+                      <MenuItem value={1}>Select Category</MenuItem>
+                      {(categoryListing.data || []).map(element => (
+                        <MenuItem value={element._id}>{element.title}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                   <input
                     accept="image/*"
                     hidden
                     id="raised-button-file"
                     multiple
                     type="file"
+                    onChange={handleFileUpload}
                   />
                   <label htmlFor="raised-button-file">
                     <div
@@ -150,7 +251,7 @@ const Layout = () => {
                         color="textSecondary"
                         style={{ padding: '0 10px' }}
                       >
-                        Upload doctor image
+                        {(file || {}).name || 'Upload doctor image'}
                       </Typography>
                     </div>
                   </label>
@@ -160,8 +261,16 @@ const Layout = () => {
                     style={{ marginTop: 15 }}
                     onClick={handleAddDoctor}
                     fullWidth
+                    disabled={!formState.isValid}
                   >
-                    Submit
+                    {categoryListing.loading && (
+                      <CircularProgress
+                        color="inherit"
+                        size={20}
+                        style={{ marginRight: 10 }}
+                      />
+                    )}{' '}
+                    {formState.isValid ? 'Submitting..' : 'Submit'}
                   </Button>
                 </form>
               </Grid>

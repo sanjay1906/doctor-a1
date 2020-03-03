@@ -1,4 +1,4 @@
-const { Hospital ,Doctor} = require("Models");
+const { Hospital ,Doctor,Category} = require("Models");
 const { handleError } = require("Helper");
 
 const METERS_PER_MILES = 1609.34;
@@ -16,10 +16,12 @@ const getHospitalById = async (req, res, next) => {
   try {
     const hospital = await Hospital.findOne({_id:hospitalId});
     const doctors = await Doctor.find({hospitalId});
+    const categories = await Category.find({_id:{$in:hospital.category||[]}});
     
     res.json({
       data: {
         ...hospital.toObject(),
+        category:categories,
         doctors,
       },
       success: true
@@ -50,7 +52,7 @@ const getNearyByHospitals = async (req, res, next) => {
           $maxDistance: distance * METERS_PER_MILES
         }
       }
-    }).limit(parseInt(limit));
+    }).populate({category:1}).limit(parseInt(limit));
 
     res.json({
       success: true,

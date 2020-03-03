@@ -2,8 +2,8 @@ const router = require('express').Router();
 const path = require('path');
 
 /**
- *
- * @param {string} root
+ * 
+ * @param {string} root 
  */
 
 const portalServe = async (req, res, next) => {
@@ -12,6 +12,7 @@ const portalServe = async (req, res, next) => {
     return;
   }
   res.sendFile(path.join(__dirname, '../../../portal/build/index.html'));
-};
+}
+
 
 module.exports = portalServe;

@@ -11,6 +11,7 @@ import {
   Button,
   Link
 } from '@material-ui/core';
+import Snackbar from 'Components/Snakbar';
 
 import PersonIcon from '@material-ui/icons/Person';
 import { AuthServices } from 'Services';
@@ -41,6 +42,11 @@ const Layout = props => {
     touched: {},
     errors: {}
   });
+  const [state, setState] = useState({
+    isOpen: false,
+    variant: 'error',
+    message: ''
+  });
 
   useEffect(() => {
     const errors = validate(formState.values, schema);
@@ -70,13 +76,14 @@ const Layout = props => {
   const handleLogin = async () => {
     const { username, password } = formState.values;
     try {
-      // Todo : Validate username and password should always has value
-      const response = await AuthServices.login(username, password);
-      // if(!response.success)
+      await AuthServices.login(username, password);
       history.push('/hospital');
     } catch (err) {
-      alert('user not here');
-      // Todo : Display Error message to User
+      setState({
+        isOpen: true,
+        message: 'User is not found'
+      });
+      formState.values = '';
       console.log('err', err);
     } finally {
     }
@@ -88,6 +95,12 @@ const Layout = props => {
   return (
     <div className={classes.loginpage}>
       <Header title="Login" />
+      <Snackbar
+        errorMessage={state.message}
+        isOpen={state.isOpen}
+        variant={state.variant}
+        handleClose={() => setState({ isOpen: false })}
+      />
       <div>
         <Container className={classes.Container} maxWidth="md">
           <div className={classes.SingIn}>
@@ -113,7 +126,8 @@ const Layout = props => {
                       onChange={handleChange}
                       size="medium"
                       placeholder="Username Or Email"
-                      type="text"
+                      type="email"
+                      required
                       value={formState.values.username || ''}
                       InputProps={{
                         startAdornment: (
@@ -159,13 +173,21 @@ const Layout = props => {
                         className={classes.SigninButton}
                         disabled={!formState.isValid}
                       >
-                        {formState.isValid ? 'Login...' : 'Login'}
+                        {formState.isValid ? 'Login' : 'Login'}
                       </Button>
                     </div>
                     <div className={classes.links}>
-                      <Link className={classes.link}>Forget Password !!</Link>
-                      <Link className={classes.link}>
-                        New Here ?? Register Here
+                      <Link
+                        className={classes.link}
+                        style={{ marginBottom: 3 }}
+                      >
+                        Forget Password !!
+                      </Link>
+                      <Link
+                        className={classes.link}
+                        onClick={() => history.push('/register')}
+                      >
+                        > New Here ?? Register Here
                       </Link>
                     </div>
                   </div>

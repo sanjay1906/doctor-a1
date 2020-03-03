@@ -1,4 +1,4 @@
-const { Doctor } = require("Models");
+const { Doctor ,Hospital} = require("Models");
 const { handleError } = require("Helper");
 
 const addDoctor = async (req,res,next) => {
@@ -17,6 +17,8 @@ const addDoctor = async (req,res,next) => {
           coordinates: [longitude, latitude],
         }
     });
+
+    await Hospital.updateOne({_id:hospitalId},{ $addToSet: { category:category }});
 
     await doctor.save();
     res.status(200);

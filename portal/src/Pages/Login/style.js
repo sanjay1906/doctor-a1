@@ -57,7 +57,11 @@ const useStyles = makeStyles(theme => ({
     fontSize: "1rem",
     letterSpacing: "1px",
     marginBottom: "0.3rem",
-    background: "#4292DC"
+    background: "#7563FF",
+    color: "#fff",
+    "&:hover": {
+      background: "#4031ea"
+    }
   },
   Button: {
     [theme.breakpoints.only("xs")]: {

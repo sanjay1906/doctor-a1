@@ -5,6 +5,7 @@ const Order = require('./Order');
 const Doctor = require('./Doctor');
 const Cab = require('./Cab');
 const Patient = require('./Patient');
+const Category = require('./Category');
 
 module.exports = {
   SchemaOptions,
@@ -14,4 +15,5 @@ module.exports = {
   Doctor,
   Cab,
   Patient,
+  Category
 };

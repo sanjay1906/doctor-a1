@@ -29,8 +29,8 @@ const DoctorSchema = new mongoose.Schema({
     coordinates: [mongoose.Schema.Types.Number]
   },
   category: {
-    type: mongoose.Schema.Types.String,
-    require: false,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
   },
   hospitalId: {
     type: mongoose.Schema.Types.ObjectId,

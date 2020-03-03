@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableHead, TableRow, TableCell, TableBody } from '@material-ui/core';
+import { Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@material-ui/core';
 import { getFormattedString } from 'Helper';
 import useStyles from './style';
 
@@ -27,7 +27,9 @@ const Listing = (props) => {
             </div>
         )
     }
+    
     return (
+        <div>
         <Table>
             <TableHead>
                 <TableRow>
@@ -48,6 +50,10 @@ const Listing = (props) => {
                 ))}
             </TableBody>
         </Table>
+        {!data.loading && data.data && !data.data.length && (
+            <Typography style={{textAlign:'center'}} color="textSecondary" variant="body1">No Data found</Typography>
+        )}
+        </div>
     )
 }
 

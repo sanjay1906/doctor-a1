@@ -19,13 +19,7 @@ class NetworkService {
       throw new ApplicationError(MESSAGES.NOT_REACHABLE);
     }
 
-    if (error.response) {
-      logger.error(error.response);
-      throw new ApplicationError(MESSAGES.UNKNOWN);
-    }
-
-    logger.error(error.response);
-    throw new ApplicationError(MESSAGES.UNKNOWN);
+    throw error;
   }
 
   /**

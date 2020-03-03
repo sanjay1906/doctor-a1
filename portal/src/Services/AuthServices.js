@@ -1,11 +1,12 @@
 import Config from "Config";
 import { NetworkServices, LogServices } from "Services";
-import config from 'Config';
+import config from "Config";
 
 const logger = LogServices.getInstance("AuthServices");
 const AUTH_LOCALSTORAGEKEY = "panther";
 
 class AuthService {
+  _auth;
   constructor() {
     const authString = localStorage.getItem(AUTH_LOCALSTORAGEKEY);
     if (authString) {
@@ -26,18 +27,16 @@ class AuthService {
       localStorage.setItem(AUTH_LOCALSTORAGEKEY, JSON.stringify(response.data));
       this._auth = response.data;
     }
+
     logger.debug(response);
     return response;
   }
 
   async signup(username, password) {
-    const response = await NetworkServices.post(
-      `${config.SERVER_URL}/signup`,
-      {
-        username,
-        password
-      }
-    );
+    const response = await NetworkServices.post(`${config.SERVER_URL}/signup`, {
+      username,
+      password
+    });
     if (response.success) {
       localStorage.setItem(AUTH_LOCALSTORAGEKEY, JSON.stringify(response.data));
       this._auth = response.data;

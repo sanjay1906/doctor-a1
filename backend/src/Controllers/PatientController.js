@@ -7,6 +7,7 @@ const addPatient = async (req,res,next) =>{
 
   // Validating User
   const user = await User.findById(userId);
+  console.log(user);
 
   if(!user){
     res.status(404);
@@ -18,6 +19,7 @@ const addPatient = async (req,res,next) =>{
 
   // Validating Hospital Id
   const hospital = await Hospital.findById(hospitalId);
+  console.log(hospital);
   
   if(!hospital){
     res.status(404);
@@ -41,11 +43,16 @@ const addPatient = async (req,res,next) =>{
 
   await patient.save();
 
+  console.log(patient);
+
   // Returning Response To Frontend
   res.status(200);
   return res.json({
     success:true,
-    data:patient,
+    data:{
+      ...patient.toObject(),
+      destinationLocation:hospital.location,
+    },
   });
 
   }catch(err){
