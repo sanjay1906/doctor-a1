@@ -44,7 +44,9 @@ const login = async (req, res, next) => {
     username,
     _id: user._id
   };
+
   const token = jwt.sign(JSON.stringify(authInfo), config.get("jwt").secret);
+
   res.status(200);
   res.json({
     code: 200,
@@ -80,6 +82,7 @@ const signup = async (req, res, next) => {
     });
     return;
   }
+
   const user = await User.findOne({ username, password });
   if (user) {
     res.status(401);
@@ -100,10 +103,12 @@ const signup = async (req, res, next) => {
   };
 
   const token = jwt.sign(JSON.stringify(authInfo), config.get("jwt").secret);
+
   await new User({
     username,
     password
   }).save();
+
   res.status(200);
   res.json({
     code: 200,

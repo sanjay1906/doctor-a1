@@ -1,6 +1,5 @@
-
-const mongoose = require('mongoose');
-const SchemaOptions = require('./SchemaOptions');
+const mongoose = require("mongoose");
+const SchemaOptions = require("./SchemaOptions");
 
 const Schema = mongoose.Schema;
 
@@ -17,12 +16,18 @@ const userSchema = new Schema(
     },
     isAdmin: {
       type: mongoose.Schema.Types.Boolean,
-      default: false,
+      default: false
     },
+    resetPasswordToken: {
+      type: mongoose.Schema.Types.String
+    },
+    resetPasswordExpires: {
+      type: mongoose.Schema.Types.Date
+    }
   },
   SchemaOptions
 );
 
 userSchema.index({ username: 1, sparse: true }, { background: true });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

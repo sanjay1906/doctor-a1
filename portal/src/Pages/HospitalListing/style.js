@@ -46,6 +46,10 @@ const useStyles = makeStyles(theme => ({
   },
   Doctorside: {
     color: deepPurple[500]
+  },
+  small: {
+    width: theme.spacing(3),
+    height: theme.spacing(3)
   }
 }));
 
