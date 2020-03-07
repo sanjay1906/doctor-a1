@@ -98,20 +98,6 @@ const addHospital = async (req, res, next) => {
     }
   };
   try {
-    const updateHospital = await Hospital.findOne({ emailId });
-    if (updateHospital) {
-      await Hospital.findOneAndUpdate(
-        { emailId },
-        { $set: hospitalData },
-        { new: true }
-      );
-      res.status(200);
-      return res.json({
-        success: true,
-        data: 'Hospital updated'
-      });
-    }
-
     const hospital = new Hospital(hospitalData);
 
     await hospital.save();
@@ -140,10 +126,60 @@ const deleteHospitalById = async (req, res, next) => {
   });
 };
 
+const updateHospital = async (req, res, next) => {
+  const { hospitalId } = req.params;
+  const {
+    hospitalName,
+    address,
+    description,
+    websiteUrl,
+    mobileNo,
+    emailId,
+    hospitalImage,
+    latitude,
+    longitude
+  } = req.body;
+  const hospitalData = {
+    hospitalName,
+    address,
+    description,
+    websiteUrl,
+    mobileNo,
+    emailId,
+    thumbnailImage:
+      hospitalImage ||
+      'https://clarkebenefits.com/wp-content/uploads/2018/07/hospital-icon.png',
+    location: {
+      type: 'Point',
+      coordinates: [longitude, latitude]
+    }
+  };
+  try {
+    await Hospital.findOneAndUpdate(
+      { _id: hospitalId },
+      { $set: hospitalData },
+      { new: true }
+    );
+    res.status(200);
+    return res.json({
+      success: true,
+      data: 'Hospital updated'
+    });
+  } catch (err) {
+    res.status(404);
+    return res.json({
+      success: false,
+      data: 'Unable to update hospital',
+      err: err
+    });
+  }
+};
+
 module.exports = {
   getHospitalListing,
   getHospitalById,
   getNearyByHospitals,
   addHospital,
-  deleteHospitalById
+  deleteHospitalById,
+  updateHospital
 };

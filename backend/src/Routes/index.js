@@ -24,6 +24,7 @@ router.post('/reset/:id', ForgotPasswordController.resetPassword);
 // router.get("/gettoken", ForgotPasswordController.getToken);
 router.delete('/hospital/:hospitalId', HospitalController.deleteHospitalById);
 router.get('/gethospital/:hospitalId', HospitalController.getHospitalById);
+router.post('/updatehospital/:hospitalId', HospitalController.updateHospital);
 
 router.use(authMiddleware);
 

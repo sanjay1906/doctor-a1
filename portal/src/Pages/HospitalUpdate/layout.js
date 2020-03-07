@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useStyles from './style';
-import Header from 'Components/Header';
+import { Header, Snackbar } from 'Components';
 import { Typography, Container, Button, Grid } from '@material-ui/core';
 import { MapService } from 'Services';
 import { fetchHospitalDetail } from 'Store/action';
@@ -41,25 +41,34 @@ const Layout = () => {
   const [isValidForm, setValidForm] = useState(false);
   const [isSubmitting, setSubmitting] = useState(false);
   const [file, setFile] = useState(null);
+  const [state, setState] = useState({
+    isOpen: false,
+    variant: 'error',
+    message: ''
+  });
 
   useEffect(() => {
     if (match.params.hospitalId) {
       fetchHospitalDetail(match.params.hospitalId);
     }
+    async function fetchData() {
+      try {
+        const result = await axios.get(
+          `${Config.SERVER_URL}/gethospital/${match.params.hospitalId}`
+        );
+        const hospital = result.data.data;
+        setHospitalName(hospital.hospitalName);
+        setDescription(hospital.description);
+        setAddress(hospital.address);
+        setEmailId(hospital.emailId);
+        setMobileNo(hospital.mobileNo);
+        setWebsiteUrl(hospital.websiteUrl);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    fetchData();
   }, [match]);
-
-  useEffect(async () => {
-    const result = await axios.get(
-      `${Config.SERVER_URL}/gethospital/${match.params.hospitalId}`
-    );
-    const hospital = result.data.data;
-    setHospitalName(hospital.hospitalName);
-    setDescription(hospital.description);
-    setAddress(hospital.address);
-    setEmailId(hospital.emailId);
-    setMobileNo(hospital.mobileNo);
-    setWebsiteUrl(hospital.websiteUrl);
-  }, []);
 
   const handleCoordinates = async () => {
     if (!address) {
@@ -91,6 +100,39 @@ const Layout = () => {
         !mobileNo ||
         !emailId
       ) {
+        setState({
+          message: 'fill all field',
+          isOpen: true,
+          variant: 'error'
+        });
+        setSubmitting(false);
+        return setValidForm(false);
+      }
+      if (!mobileNo.length === 10) {
+        setState({
+          message: 'mobo not valid!',
+          isOpen: true,
+          variant: 'error'
+        });
+        setSubmitting(false);
+        return setValidForm(false);
+      }
+      if (!file) {
+        setState({
+          message:
+            'Photo nakho ....photo na hoy to padavo pasi nakho ..pan photo to joiye j!',
+          isOpen: true,
+          variant: 'error'
+        });
+        setSubmitting(false);
+        return setValidForm(false);
+      }
+      if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emailId)) {
+        setState({
+          message: 'You have entered an invalid email address!',
+          isOpen: true,
+          variant: 'error'
+        });
         setSubmitting(false);
         return setValidForm(false);
       }
@@ -102,16 +144,24 @@ const Layout = () => {
       }
 
       // Api Calling Will be here
-      await addHospitalAction({
-        address,
-        hospitalName,
-        description,
-        websiteUrl,
-        mobileNo,
-        emailId,
-        latitude: coordinates.lat,
-        longitude: coordinates.lng,
-        hospitalImage: imageUrl
+      await axios.post(
+        `${Config.SERVER_URL}/updatehospital/${match.params.hospitalId}`,
+        {
+          address,
+          hospitalName,
+          description,
+          websiteUrl,
+          mobileNo,
+          emailId,
+          latitude: coordinates.lat,
+          longitude: coordinates.lng,
+          hospitalImage: imageUrl
+        }
+      );
+      setState({
+        message: 'Hospital updated succassfully!',
+        isOpen: true,
+        variant: 'error'
       });
       history.push('/adminhospital');
     } catch (err) {
@@ -126,6 +176,12 @@ const Layout = () => {
   return (
     <div className={classes.hospitalDetails}>
       <Header title="Update Hospital" />
+      <Snackbar
+        errorMessage={state.message}
+        isOpen={state.isOpen}
+        handleClose={() => setState({ isOpen: false })}
+        variant={state.variant}
+      />
       <div className={classes.hospitalsDetailsContent}>
         <Container className={classes.Container} maxWidth="md">
           <Grid>

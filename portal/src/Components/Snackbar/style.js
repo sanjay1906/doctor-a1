@@ -1,9 +1,9 @@
 const styles = theme => ({
   error: {
-    backgroundColor: "red"
+    backgroundColor: theme.palette.error.main
   },
   success: {
-    backgroundColor: "green"
+    backgroundColor: 'green'
   }
 });
 

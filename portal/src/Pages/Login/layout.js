@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useStyles from './style';
-import { Header } from 'Components';
+import { Header, Snackbar } from 'Components';
 import LockIcon from '@material-ui/icons/Lock';
 import validate from 'validate.js';
 import {
@@ -11,7 +11,6 @@ import {
   Button,
   Link
 } from '@material-ui/core';
-import Snackbar from 'Components/Snakbar';
 
 import PersonIcon from '@material-ui/icons/Person';
 import { AuthServices } from 'Services';
@@ -113,22 +112,22 @@ const Layout = props => {
                     </Typography>
                     <TextField
                       autoFocus
+                      name="username"
                       error={hasError('username')}
                       helperText={
                         hasError('username')
                           ? formState.errors.username[0]
                           : null
                       }
+                      onChange={handleChange}
+                      value={formState.values.username || ''}
                       className={classes.TextField}
                       id="input-with-icon-AcccountCircle"
                       fullWidth
-                      name="username"
-                      onChange={handleChange}
                       size="medium"
                       placeholder="Username Or Email"
                       type="email"
                       required
-                      value={formState.values.username || ''}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
