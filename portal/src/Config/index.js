@@ -22,7 +22,10 @@ const config = {
   get MAP_URL() {
     return `https://maps.google.com/maps/api/geocode/json?key=AIzaSyC_W2QaRiFEj4HU-F_uyAlN2oUXKcBoPZw`;
   },
-  get FIREBASE_CONFIG(){
+  get MapBox_API() {
+    return "pk.eyJ1Ijoia2lzaGFucGF0ZWw4ODk5IiwiYSI6ImNrN3UycXk1aDExdGYzbW91cDU3MmtmbWkifQ._7OcYLqdEx_peUl12hGelA";
+  },
+  get FIREBASE_CONFIG() {
     return {
       apiKey: "AIzaSyBde_gv14KMZMcErnQJbNbJXdD0hxXAHdw",
       authDomain: "portfolio-53d8e-eca0e.firebaseapp.com",

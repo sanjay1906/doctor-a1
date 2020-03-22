@@ -23,3 +23,10 @@ export const currentOrder = state => {
 export const selectOrderByType = state => {
   return selectState(state).userOrder;
 };
+export const mail = state => {
+  return selectState(state).mail;
+};
+
+export const userLoad = state => {
+  return selectState(state).loadUser;
+};

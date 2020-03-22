@@ -25,26 +25,38 @@ transporter.verify((err, success) => {
 });
 
 const SendMail = async (req, res, next) => {
-  let message = `Hey,We are Receve Your Request Thank you...`;
+  let message = "You are receiving Your Request,.\n\n";
 
-  // if (!patientEmail) {
-  //   res.send("PatientEmail  is Required");
-  // }
-  // if (!hospitalEmail) {
-  //   res.send("HospitalEmail  is Required");
-  // }
+  const errorMessage = [];
 
-  // if (!patientEmail || !hospitalEmail) {
-  //   res.send("HospialEmail and PatientEmail is Required");
-  // }
+  const { patientEmail, hospitalEmail } = req.body;
+
+  if (!patientEmail) {
+    errorMessage.push("PatientEmailid Is Undefine");
+  }
+  if (!hospitalEmail) {
+    errorMessage.push("HospitalEmailid is not Define");
+  }
+
+  if (!patientEmail || !hospitalEmail) {
+    res.status(404);
+    res.json({
+      code: 401,
+      data: {
+        errorMessage
+      },
+      success: false
+    });
+    return;
+  }
 
   try {
-    const patientmail = req.body.patientmail;
-    const hospitalmail = req.body.hospitalmail;
+    const patientmail = patientEmail;
+    const hospitalmail = hospitalEmail;
     var mail = {
       from: patientmail,
       to: hospitalmail,
-      subject: "Here Message is",
+      subject: "Here Is Your Mail",
       text: message
     };
     transporter.sendMail(mail, (err, data) => {
@@ -59,8 +71,7 @@ const SendMail = async (req, res, next) => {
         res.status(200);
         return res.json({
           success: true,
-          message: "mail Send Successfully",
-          data: data
+          data: { data, message: "mail Send Successfully" }
         });
       }
     });

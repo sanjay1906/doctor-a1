@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const { User } = require("Models");
+var bcrypt = require("bcryptjs");
 
 const login = async (req, res, next) => {
   const { username, password } = req.body;
@@ -23,21 +24,27 @@ const login = async (req, res, next) => {
     return;
   }
 
-  const user = await User.findOne(
-    { username, password },
-    { username: 1, isAdmin: 1 }
-  );
+  const user = await User.findOne({ username });
+
   if (!user) {
     res.status(401);
     res.json({
       code: 401,
       data: {
-        message: ["Invalid username or password"]
+        message: "Invalid username or password"
       },
       success: false
     });
     return;
   }
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    return res.status(400).json({
+      message: "Invalid credentials"
+    });
+  }
+
   const expiredOn = Date.now() + 1000 * 60 * 60;
   const authInfo = {
     expiredOn,
@@ -83,32 +90,31 @@ const signup = async (req, res, next) => {
     return;
   }
 
-  const user = await User.findOne({ username, password });
+  const user = await User.findOne({ username });
   if (user) {
     res.status(401);
     res.json({
       code: 401,
       data: {
-        message: ["User is already exists"]
+        message: "User is already exists"
       },
       success: false
     });
     return;
   }
+  var salt = bcrypt.genSaltSync(10);
+  var encryptedPassword = bcrypt.hashSync(password, salt);
 
   const expiredOn = Date.now() + 1000 * 60 * 60;
   const authInfo = {
     expiredOn,
     username
   };
-
   const token = jwt.sign(JSON.stringify(authInfo), config.get("jwt").secret);
-
   await new User({
     username,
-    password
+    password: encryptedPassword
   }).save();
-
   res.status(200);
   res.json({
     code: 200,

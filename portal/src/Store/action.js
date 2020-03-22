@@ -2,7 +2,7 @@
 import { store } from "./index";
 import { handleError } from "./helper";
 import { NetworkServices } from "Services";
-import { AuthServices } from "Services";
+
 import {
   hospitalListingAction,
   hospitalDetailAction,
@@ -10,7 +10,8 @@ import {
   addCategoryAction,
   categoryListingAction,
   currentOrderAction,
-  userOrderAction
+  userOrderAction,
+  sendMailAction
 } from "./reducer";
 import Config from "Config";
 
@@ -48,9 +49,7 @@ export const addHospitalAction = async data => {
 export const fetchHospitalDetail = async hospitalId => {
   try {
     store.dispatch(hospitalDetailAction.init());
-
     // Api Calling
-
     const response = await NetworkServices.get(
       `${Config.SERVER_URL}/hospital/${hospitalId}`
     );
@@ -180,7 +179,6 @@ export const fetchOrderByType = async userId => {
       response.data[index].verificaionCode = element.patientId.verificaionCode;
     });
 
-    // console.log('data',response.data);
     store.dispatch(userOrderAction.success(response.data));
   } catch (err) {
     handleError(err);
@@ -188,6 +186,24 @@ export const fetchOrderByType = async userId => {
       userOrderAction.failed({
         internalMessage: err.message,
         displayMessage: "Error in fetchCategory"
+      })
+    );
+  }
+};
+//Send mail Action
+export const sendMail = async data => {
+  try {
+    store.dispatch(sendMailAction.init());
+    const response = await NetworkServices.post(`${Config.SERVER_URL}/mail`, {
+      ...data
+    });
+    store.dispatch(sendMailAction.success(response.data));
+  } catch (err) {
+    handleError(err);
+    store.dispatch(
+      sendMailAction.failed({
+        internalMessage: err.message,
+        displayMessage: err.response.data.message
       })
     );
   }

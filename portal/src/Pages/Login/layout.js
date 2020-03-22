@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import useStyles from './style';
-import { Header, Snackbar } from 'Components';
-import LockIcon from '@material-ui/icons/Lock';
-import validate from 'validate.js';
+import React, { useEffect, useState } from "react";
+import useStyles from "./style";
+import { Header, Snackbar } from "Components";
+import LockIcon from "@material-ui/icons/Lock";
+
 import {
   Typography,
   TextField,
@@ -10,86 +10,65 @@ import {
   Container,
   Button,
   Link
-} from '@material-ui/core';
-
-import PersonIcon from '@material-ui/icons/Person';
-import { AuthServices } from 'Services';
-import { useHistory } from 'react-router-dom';
-
-const schema = {
-  username: {
-    presence: { allowEmpty: false, message: 'is required' },
-    email: true,
-    length: {
-      maximum: 64
-    }
-  },
-  password: {
-    presence: { allowEmpty: false, message: 'is required' },
-    length: {
-      maximum: 128
-    }
-  }
-};
+} from "@material-ui/core";
+import PersonIcon from "@material-ui/icons/Person";
+import { AuthServices } from "Services";
+import { useHistory } from "react-router-dom";
 
 const Layout = props => {
   const classes = useStyles();
   const history = useHistory();
-  const [formState, setFormState] = useState({
-    isValid: false,
-    values: {},
-    touched: {},
-    errors: {}
-  });
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+
   const [state, setState] = useState({
     isOpen: false,
-    variant: 'error',
-    message: ''
+    variant: "error",
+    message: ""
   });
 
-  useEffect(() => {
-    const errors = validate(formState.values, schema);
-    setFormState(formState => ({
-      ...formState,
-      isValid: errors ? false : true,
-      errors: errors || {}
-    }));
-  }, [formState.values]);
+  const handleLogin = async e => {
+    e.preventDefault();
+    if (!email && !password) {
+      return setState({
+        isOpen: true,
+        message: "All field is Required"
+      });
+    }
+    if (!email) {
+      return setState({
+        isOpen: true,
+        message: "Your Email is Required"
+      });
+    }
+    if (!password) {
+      return setState({
+        isOpen: true,
+        message: "Your Password is Required"
+      });
+    }
+    const EmailPatten = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  const handleChange = event => {
-    event.persist();
-
-    setFormState(formState => ({
-      ...formState,
-      values: {
-        ...formState.values,
-        [event.target.name]: event.target.value
-      },
-      touched: {
-        ...formState.touched,
-        [event.target.name]: true
-      }
-    }));
-  };
-
-  const handleLogin = async () => {
-    const { username, password } = formState.values;
+    if (!EmailPatten.test(email)) {
+      return setState({
+        isOpen: true,
+        message: "Please Enter Valid Email"
+      });
+    }
     try {
-      await AuthServices.login(username, password);
-      history.push('/hospital');
+      await AuthServices.login(email, password).then(() =>
+        history.push("/hospital")
+      );
     } catch (err) {
       setState({
         isOpen: true,
-        message: 'User is not found'
+        message: "Enable to Found User in Database"
       });
-      formState.values = '';
-      console.log('err', err);
     } finally {
+      setEmail("");
+      setPassword("");
     }
   };
-
-  const hasError = field =>
-    formState.touched[field] && formState.errors[field] ? true : false;
 
   return (
     <div className={classes.loginpage}>
@@ -112,52 +91,39 @@ const Layout = props => {
                     </Typography>
                     <TextField
                       autoFocus
-                      name="username"
-                      error={hasError('username')}
-                      helperText={
-                        hasError('username')
-                          ? formState.errors.username[0]
-                          : null
-                      }
-                      onChange={handleChange}
-                      value={formState.values.username || ''}
                       className={classes.TextField}
                       id="input-with-icon-AcccountCircle"
                       fullWidth
+                      name="username"
                       size="medium"
+                      onChange={e => setEmail(e.target.value)}
+                      value={email}
                       placeholder="Username Or Email"
                       type="email"
                       required
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <PersonIcon style={{ color: '#222222' }} />
+                            <PersonIcon style={{ color: "#222222" }} />
                           </InputAdornment>
                         )
                       }}
                     />
                     <TextField
-                      error={hasError('password')}
                       className={classes.TextField}
                       id="input-with-icon-Lock"
                       placeholder="Password"
                       name="password"
                       fullWidth
-                      helperText={
-                        hasError('password')
-                          ? formState.errors.password[0]
-                          : null
-                      }
                       type="password"
-                      onChange={handleChange}
-                      type="password"
-                      value={formState.values.password || ''}
+                      onChange={e => setPassword(e.target.value)}
+                      value={password}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
                             <LockIcon
                               style={{
-                                color: '#222222'
+                                color: "#222222"
                               }}
                             />
                           </InputAdornment>
@@ -169,23 +135,20 @@ const Layout = props => {
                         variant="contained"
                         color="primary"
                         onClick={handleLogin}
-                        className={classes.SigninButton}
-                        disabled={!formState.isValid}
-                      >
-                        {formState.isValid ? 'Login' : 'Login'}
+                        className={classes.SigninButton}>
+                        Login
                       </Button>
                     </div>
                     <div className={classes.links}>
                       <Link
                         className={classes.link}
                         style={{ marginBottom: 3 }}
-                      >
+                        onClick={() => history.push("/forgotpassword")}>
                         Forget Password !!
                       </Link>
                       <Link
                         className={classes.link}
-                        onClick={() => history.push('/register')}
-                      >
+                        onClick={() => history.push("/register")}>
                         > New Here ?? Register Here
                       </Link>
                     </div>

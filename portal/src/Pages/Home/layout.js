@@ -16,19 +16,20 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import MailIcon from "@material-ui/icons/Mail";
+import AssessmentIcon from "@material-ui/icons/Assessment";
+import MapIcon from "@material-ui/icons/Map";
 import Map from "./component/Map";
-import { InputBase } from "@material-ui/core";
+import Charts from "Pages/Charts";
 
-import { InputComponent } from "Components";
+import { InputComponent, Chat } from "Components";
 
 import useStyles from "./style";
 
 export default function MiniDrawer() {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState(1);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -86,19 +87,41 @@ export default function MiniDrawer() {
         <Divider />
 
         <List>
-          {["All mail", "Trash", "Spam"].map((text, index) => (
-            <ListItem button key={text}>
+          <div className={classes.listItem} onClick={() => setStep(1)}>
+            <ListItem>
               <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                <MapIcon style={{ fontSize: "2rem", color: "#e263ff" }} />
               </ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemText> Map </ListItemText>
+              <ListItemText />
             </ListItem>
-          ))}
+          </div>
+          <Divider />
+          <div className={classes.listItem} onClick={() => setStep(2)}>
+            <ListItem>
+              <ListItemIcon>
+                <AssessmentIcon
+                  style={{ fontSize: "2rem", color: "#e263ff" }}
+                />
+              </ListItemIcon>
+              <ListItemText> Charts </ListItemText>
+              <ListItemText />
+            </ListItem>
+          </div>
         </List>
       </Drawer>
       <main className={classes.content}>
         <div style={{ padding: 20, marginTop: "3rem" }}>
-          <div style={{ display: "flex" }}>
+          {step === 1 && <Map />}
+          {step === 2 && <Charts />}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+{
+  /* <div style={{ display: "flex" }}>
             <InputBase
               placeholder="Search your desease"
               fullWidth
@@ -110,19 +133,28 @@ export default function MiniDrawer() {
               aria-label="search">
               <SearchIcon color="primary" />
             </IconButton>
-          </div>
-        </div>
-        {/* <div> */}
-        {/* {Boolean(state.isLoaded) && ( */}
-        <Map />
-        {/* )} */}
-        {/* {Boolean(mapPermission !== "granted" && state.isLoaded) && (
+          </div> */
+}
+{
+  /* <div> */
+}
+{
+  /* {Boolean(state.isLoaded) && ( */
+}
+{
+  /* <Map /> */
+}
+
+{
+  /* )} */
+}
+{
+  /* {Boolean(mapPermission !== "granted" && state.isLoaded) && (
             <div>
               <p>Please enable Geolocation permission</p>
             </div>
-          )} */}
-        {/* </div> */}
-      </main>
-    </div>
-  );
+          )} */
+}
+{
+  /* </div> */
 }

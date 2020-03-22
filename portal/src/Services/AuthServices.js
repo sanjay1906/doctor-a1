@@ -2,6 +2,10 @@ import Config from "Config";
 import { NetworkServices, LogServices } from "Services";
 import config from "Config";
 
+import { store } from "../Store/index";
+import { handleError } from "Store/helper";
+import { loadUserAction, loginAction } from "Store/reducer";
+
 const logger = LogServices.getInstance("AuthServices");
 const AUTH_LOCALSTORAGEKEY = "panther";
 
@@ -23,9 +27,21 @@ class AuthService {
       username,
       password
     });
+
     if (response.success) {
       localStorage.setItem(AUTH_LOCALSTORAGEKEY, JSON.stringify(response.data));
       this._auth = response.data;
+      try {
+        store.dispatch(loginAction.init());
+        store.dispatch(loginAction.success());
+      } catch (err) {
+        handleError(err);
+        store.dispatch(
+          loginAction.failed({
+            displayMessage: "Regiseter Failed"
+          })
+        );
+      }
     }
 
     logger.debug(response);
@@ -37,11 +53,23 @@ class AuthService {
       username,
       password
     });
+
     if (response.success) {
       localStorage.setItem(AUTH_LOCALSTORAGEKEY, JSON.stringify(response.data));
       this._auth = response.data;
+      try {
+        store.dispatch(loadUserAction.init());
+        store.dispatch(loadUserAction.success());
+      } catch (err) {
+        handleError(err);
+        store.dispatch(
+          loadUserAction.failed({
+            displayMessage: "Failed to Register"
+          })
+        );
+      }
     }
-    logger.debug(response);
+    // logger.debug(response);
     return response;
   }
 
@@ -55,7 +83,6 @@ class AuthService {
       this._auth = undefined;
       return false;
     }
-
     return true;
   }
 

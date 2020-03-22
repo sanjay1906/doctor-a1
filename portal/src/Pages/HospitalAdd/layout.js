@@ -1,24 +1,25 @@
-import React, { useState } from 'react';
-import useStyles from './style';
-import { Header, Snackbar } from 'Components';
-import { Typography, Container, Button, Grid } from '@material-ui/core';
-import { MapService } from 'Services';
-
+import React, { useState } from "react";
+import useStyles from "./style";
+import { Header } from "Components";
+import { Typography, Container, Button, Grid } from "@material-ui/core";
+import { MapService } from "Services";
+import Snackbar from "Components/Snakbar";
+import CircularProgress from "@material-ui/core/CircularProgress";
 //icon
-import EmailIcon from '@material-ui/icons/Email';
-import PersonIcon from '@material-ui/icons/Person';
-import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-import HttpIcon from '@material-ui/icons/Http';
-import HomeIcon from '@material-ui/icons/Home';
-import CreateIcon from '@material-ui/icons/Create';
-import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
+import EmailIcon from "@material-ui/icons/Email";
+import PersonIcon from "@material-ui/icons/Person";
+import PhoneAndroidIcon from "@material-ui/icons/PhoneAndroid";
+import LocationOnIcon from "@material-ui/icons/LocationOn";
+import HttpIcon from "@material-ui/icons/Http";
+import HomeIcon from "@material-ui/icons/Home";
+import CreateIcon from "@material-ui/icons/Create";
+import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 
-import { InputComponent } from 'Components';
-import { handleError } from 'Store/helper';
-import { addHospitalAction } from 'Store/action';
-import { useHistory } from 'react-router-dom';
-import ExpressFirebase from 'express-firebase';
+import { InputComponent } from "Components";
+import { handleError } from "Store/helper";
+import { addHospitalAction } from "Store/action";
+import { useHistory } from "react-router-dom";
+import ExpressFirebase from "express-firebase";
 
 const Layout = () => {
   const [coordinates, setCoordinates] = useState();
@@ -34,8 +35,8 @@ const Layout = () => {
   const [file, setFile] = useState(null);
   const [state, setState] = useState({
     isOpen: false,
-    variant: 'error',
-    message: ''
+    variant: "error",
+    message: ""
   });
 
   const classes = useStyles();
@@ -71,37 +72,36 @@ const Layout = () => {
         !emailId
       ) {
         setState({
-          message: 'fill all field',
+          message: "All Field is Required",
           isOpen: true,
-          variant: 'error'
+          variant: "error"
         });
         setSubmitting(false);
         return setValidForm(false);
       }
       if (mobileNo.length !== 10) {
         setState({
-          message: 'mobo not valid!',
+          message: "Please Check Your Mobile No!",
           isOpen: true,
-          variant: 'error'
+          variant: "error"
         });
         setSubmitting(false);
         return setValidForm(false);
       }
       if (!file) {
         setState({
-          message:
-            'Photo nakho ....photo na hoy to padavo pasi nakho ..pan photo to joiye j!',
+          message: "You are not select Image",
           isOpen: true,
-          variant: 'error'
+          variant: "error"
         });
         setSubmitting(false);
         return setValidForm(false);
       }
       if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emailId)) {
         setState({
-          message: 'You have entered an invalid email address!',
+          message: "You have entered an invalid email address!",
           isOpen: true,
-          variant: 'error'
+          variant: "error"
         });
         setSubmitting(false);
         return setValidForm(false);
@@ -125,7 +125,7 @@ const Layout = () => {
         longitude: coordinates.lng,
         hospitalImage: imageUrl
       });
-      history.push('/hospital');
+      history.push("/");
     } catch (err) {
       // Handling Error
       handleError(err);
@@ -208,20 +208,18 @@ const Layout = () => {
                     <label htmlFor="raised-button-file">
                       <div
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
+                          display: "flex",
+                          alignItems: "center",
                           flex: 1,
                           paddingBottom: 8,
-                          borderBottom: '1px solid rgba(0,0,0,0.5)'
-                        }}
-                      >
+                          borderBottom: "1px solid rgba(0,0,0,0.5)"
+                        }}>
                         <AddAPhotoIcon color="primary" />
                         <Typography
                           variant="body2"
                           color="textSecondary"
-                          style={{ padding: '0 10px' }}
-                        >
-                          {(file || {}).name || 'Choose Hospital Image'}
+                          style={{ padding: "0 10px" }}>
+                          {(file || {}).name || "Choose Hospital Image"}
                         </Typography>
                       </div>
                     </label>
@@ -240,7 +238,7 @@ const Layout = () => {
                       value={
                         coordinates
                           ? `Latitude : ${coordinates.lat} Longitude : ${coordinates.lng}`
-                          : ''
+                          : ""
                       }
                       disabled
                       Icon={LocationOnIcon}
@@ -270,9 +268,12 @@ const Layout = () => {
                 className={classes.hospitalButton}
                 onClick={addHospital}
                 fullWidth
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit'}
+                disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <CircularProgress size="1.5rem" color="Primary" />
+                ) : (
+                  "Submit"
+                )}
               </Button>
             </form>
           </Grid>

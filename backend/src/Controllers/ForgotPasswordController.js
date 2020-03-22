@@ -1,11 +1,10 @@
 const config = require("config");
 const nodemailer = require("nodemailer");
-const jwt = require("jsonwebtoken");
+
 var bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
 const { User } = require("Models");
-
 const forgotPassword = async (req, res, next) => {
   //checking user
   const { username } = req.body;
@@ -13,7 +12,6 @@ const forgotPassword = async (req, res, next) => {
   if (!username) {
     msg.push("Username is required");
   }
-
   if (!username) {
     res.status(404);
     res.json({
@@ -38,17 +36,11 @@ const forgotPassword = async (req, res, next) => {
     });
     return;
   }
-  const expiredOn = Date.now() + 1000 * 60 * 60;
-  // const authInfo = {
-  //   expiredOn,
-  //   username
-  // };
-  // const token = jwt.sign(JSON.stringify(authInfo), config.get("jwt").secret);
   const token = crypto.randomBytes(20).toString("hex");
   await User.findByIdAndUpdate(
     { _id: user._id },
     { resetPasswordToken: token },
-    { reset_password_expires: expiredOn }
+    { resetPasswordExpires: Date.now() + 3600000 }
   );
   //node-mailer,
   var transport = {
@@ -62,7 +54,7 @@ const forgotPassword = async (req, res, next) => {
   transporter.verify((err, success) => {
     try {
       if (success) {
-        console.log("validation is COrrect...");
+        console.log("Mail is Verifyed...");
       }
     } catch (error) {
       if (error) {
@@ -70,7 +62,7 @@ const forgotPassword = async (req, res, next) => {
       }
     }
   });
-  let message = `Hey,We are receive Your Request Thank you...`;
+
   var mail = {
     from: config.get("user"),
     to: username,
@@ -84,121 +76,83 @@ const forgotPassword = async (req, res, next) => {
 
   //sending mail
   transporter.sendMail(mail, (err, data) => {
-    if (err) {
-      res.status(400);
+    try {
+      if (data) {
+        res.status(200);
+        return res.json({
+          success: true,
+          message: "Kindly Check Your Email for  further instructions",
+          data: data
+        });
+      } else {
+        res.status(404);
+        return res.json({
+          success: false,
+          message: "message Could not send",
+          err: err
+        });
+      }
+    } catch (error) {
+      res.status(404);
       return res.json({
         success: false,
-        message: "message Could not send",
-        err: err
-      });
-    } else {
-      res.status(200);
-      return res.json({
-        success: true,
-        message: "Kindly Check Your Email for  further instructions "
-        // data: data
+        message: "Somthigng Went Wrong",
+        err: error
       });
     }
   });
 };
 
-//RESET-PASSWORD
+const gettoken = async (req, res) => {
+  const { token } = req.params;
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() }
+  });
+  if (!user) {
+    return res.status(400).send({
+      errors: [{ title: "Invalid token!", detail: "User does not exist" }]
+    });
+  } else {
+    res.send("User is found ");
+  }
+  res.json("reset");
+};
 
-const resetPassword = async (req, res, next) => {
+const resetPassword = async (req, res) => {
   try {
+    const { token } = req.params;
     const user = await User.findOne({
-      resetPasswordToken: req.params.resetPasswordToken,
-      resetPasswordExpires: {
-        $gt: Date.now()
-      }
+      resetPasswordToken: token
     });
     if (!user) {
-      return res
-        .status(401)
-        .json({ message: "Password reset token is invalid or has expired." });
+      return res.status(422).send({
+        errors: { title: "Invalid token!", detail: "User does not exist" }
+      });
     }
-    user.password = req.body.password;
+    const salt = await bcrypt.genSaltSync(10);
+    user.password = await bcrypt.hashSync(req.body.newPassword, salt);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
+
     user.save(err => {
       if (err) {
-        return res.status(422).send({
+        return res.status(404).send({
           message: err
         });
-      } else {
-        var resetMail = {
-          from: config.get("user"),
-          to: user,
-          subject: "Password Reset Confirmation",
-          text: "hey your password reset successfully..."
-        };
-        transporter.sendMail(resetMail, (err, data) => {
-          if (err) {
-            res.status(400);
-            return res.json({
-              success: false,
-              message: "message Could not send",
-              err: err
-            });
-          } else {
-            res.status(200);
-            return res.json({
-              success: true,
-              message: "Message reset succesfully"
-              // data: data
-            });
-          }
-        });
       }
+      res.json({
+        code: 200,
+        message: "YOUR PASSWORD IS RESET SUCCESSFLLY"
+      });
     });
   } catch (error) {
     console.log(error);
   }
 };
 
-// const updatepassword = async (req, res, next) => {
-//   try {
-//     const user = await User.findOne({
-//       where: {
-//         username: req.body.username
-//       }
-//     });
-//     if (user != null) {
-//       console.log("user is in db");
-//     }
-//     const hasepassword = await bcrypt.hash(req.body.password, 10);
-//     await user.update({
-//       password: hasepassword,
-//       resetPasswordToken: null,
-//       resetPasswordToken: null
-//     });
-//     console.log("password is update");
-//     res.status(200).send({ message: "update password" });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-// const getToken = async (req, res) => {
-//   const user = await User.findOne({
-//     where: {
-//       resetPasswordToken: req.params.resetPasswordToken,
-//       resetPasswordExpires: {
-//         $gt: Date.now()
-//       }
-//     }
-//   });
-//   if (user === null) {
-//     res.send("user is null");
-//   } else {
-//     res.send("ok");
-//   }
-
-//   res.send(response);
-// };
-
 module.exports = {
   forgotPassword,
-  resetPassword
-
-  // updatepassword
+  resetPassword,
+  gettoken
 };
